@@ -295,6 +295,9 @@ function setupQuickMenu() {
         case 'voice':
           bubble.show('语音输入暂不支持~');
           break;
+        case 'webui':
+          try { window.__TAURI_INTERNALS__?.invoke('open_webui'); } catch (_) {}
+          break;
         case 'sleep':
           try { window.__TAURI_INTERNALS__?.invoke('hide_window'); } catch (_) {}
           bubble.show('爱弥斯已休眠，右键托盘唤醒~');
