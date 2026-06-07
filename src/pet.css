@@ -252,7 +252,7 @@ html, body {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 14px;
   padding: 6px 4px;
-  min-width: 140px;
+  min-width: 175px; padding: 8px 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
   font-size: 13px;
@@ -336,10 +336,10 @@ html, body {
 /* sliding switch */
 .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; }
 .toggle-row:hover { background: rgba(255,140,60,.08); }
-.toggle-label { font-size: 13px; color: #E8ECF1; }
+.toggle-label { font-size: 13px; color: #1e293b; }
 .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #3A3D48; border-radius: 24px; transition: .3s; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #CBD5E1; border-radius: 24px; transition: .3s; }
 .toggle-slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
 .toggle-switch input:checked + .toggle-slider { background: #FF8C3C; }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
