@@ -55,7 +55,7 @@ async fn main() {
 
     // Build Tauri app
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app, open_webui])
+        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app, open_webui, check_autostart, toggle_autostart])
         .setup(move |app| {
             // Listen to broadcast channel, forward state changes to frontend
             let handle = app.handle().clone();
@@ -109,6 +109,30 @@ fn hide_window(window: tauri::Window) {
 #[tauri::command]
 fn exit_app(app: tauri::AppHandle) {
     app.exit(0);
+}
+
+#[tauri::command]
+fn check_autostart() -> bool {
+    let startup = std::env::var("APPDATA").unwrap_or_default()
+        .replace('\\', "/") + "/Microsoft/Windows/Start Menu/Programs/Startup/Aemeath.lnk";
+    std::path::Path::new(&startup).exists()
+}
+
+#[tauri::command]
+fn toggle_autostart() -> bool {
+    let startup_dir = std::env::var("APPDATA").unwrap_or_default()
+        .replace('\\', "/") + "/Microsoft/Windows/Start Menu/Programs/Startup";
+    let link_path = format!("{}/Aemeath.lnk", startup_dir);
+    if std::path::Path::new(&link_path).exists() {
+        std::fs::remove_file(&link_path).ok();
+        return false;
+    }
+    let exe = std::env::current_exe().unwrap_or_default();
+    std::fs::create_dir_all(&startup_dir).ok();
+    let _ = std::process::Command::new("powershell")
+        .args(["-NoProfile", "-Command", &format!("$ws=New-Object -ComObject WScript.Shell;$s=$ws.CreateShortcut('{}');$s.TargetPath='{}';$s.WorkingDirectory='{}';$s.Save()", &link_path, exe.to_string_lossy(), std::env::current_dir().unwrap_or_default().to_string_lossy())])
+        .output();
+    true
 }
 
 #[tauri::command]

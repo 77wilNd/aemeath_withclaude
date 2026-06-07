@@ -52,7 +52,7 @@ async function init() {
     clickStart = null;
   });
 
-  // Right-click on sprite → quick menu
+  // Right-click on sprite �?quick menu
   spriteEl.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     bubble.showQuickMenu();
@@ -61,7 +61,7 @@ async function init() {
   // Suppress browser right-click menu everywhere else
   document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  // Independent setups first (event listener goes last — it must not block others)
+  // Independent setups first (event listener goes last �?it must not block others)
   setupInteractiveInput();
   setupQuickMenu();
   setupConfirmButtons();
@@ -150,7 +150,7 @@ function updateBubbleStates(bubbleText, coreSignal, overlay, inputType, options)
       inputPending = true;
       const it = inputType || 'text';
       const opts = (inputType === 'select') ? options : null;
-      bubble.showInteractive(bubbleText || '请输入...', it, opts, '输入...');
+      bubble.showInteractive(bubbleText || '请输�?..', it, opts, '输入...');
       bubble.startPendingPoll();
     }
     return;
@@ -290,7 +290,7 @@ function setupQuickMenu() {
       bubble.hideQuickMenu();
       switch (action) {
         case 'message':
-          bubble.showInteractive('发消息给爱弥斯...', 'text', null, '输入消息...');
+          bubble.showInteractive('发消息给爱弥�?..', 'text', null, '输入消息...');
           break;
         case 'voice':
           bubble.show('语音输入暂不支持~');
@@ -392,4 +392,4 @@ function cancelIdleAnim() {
   if (idleAnimTimer) { clearTimeout(idleAnimTimer); idleAnimTimer = null; }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => { init(); setupAutostartToggle(); });
