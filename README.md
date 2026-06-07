@@ -6,14 +6,13 @@ Q 版像素爱弥斯桌宠，通过 HTTP hooks 与 MCP 与 Claude Code 实时联
 
 ## ⚡ Claude Code 一键部署
 
-把本仓库链接发给 Claude Code，它会自动完成部署：
+复制以下提示词发送给你的 Claude Code，自动完成部署：
 
-1. 下载 exe → 桌面
-2. 配置 hooks + MCP → `~/.claude/`
-3. （可选）部署对话管理 WebUI
-4. 启动桌宠
+```
+请根据 https://github.com/hanasite/aemeath_withclaude/blob/main/CLAUDE.md 部署爱弥斯桌宠，包括下载 exe、配置 hooks 和 MCP、启动桌宠。
+```
 
-详见 [CLAUDE.md](CLAUDE.md)。
+部署内容：下载 exe → 桌面 → 配置 hooks + MCP → `~/.claude/` → 启动 → （可选）部署对话管理 WebUI
 
 ## 功能
 
