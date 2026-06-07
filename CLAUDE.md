@@ -147,7 +147,18 @@ MCP Tool 调用
 - 休眠 — 隐藏窗口，通过托盘右键恢复
 - 关机 — 退出程序
 - 发消息 — 打开输入气泡
+- 📊 对话管理 — 打开 WebUI 对话管理器
 - 语音输入 — 暂未支持
+
+### 8. 对话管理 WebUI (webui.rs)
+
+右键菜单/托盘 → "📊 对话管理" 打开浏览器端对话管理器（`http://127.0.0.1:19876`）：
+
+- 智能启动：检测端口 19876，未运行时自动 `pythonw server.py --no-browser` 后台启动
+- 路径解析：通过 `USERPROFILE` 环境变量定位 `~/.claude/webui/server.py`
+- 依赖：`pip install flask`
+
+WebUI 独立仓库：https://github.com/hanasite/claude-code-webui
 
 ### 5. 气泡锁机制
 
