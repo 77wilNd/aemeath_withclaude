@@ -66,9 +66,7 @@ html, body {
 }
 
 #bubble.hidden {
-  opacity: 0;
-  transform: scale(0.9);
-  pointer-events: none;
+  display: none;
 }
 
 #bubble.visible {
