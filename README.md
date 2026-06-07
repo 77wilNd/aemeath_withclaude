@@ -4,6 +4,17 @@ Q 版像素爱弥斯桌宠，通过 HTTP hooks 与 MCP 与 Claude Code 实时联
 
 > 这是粉丝制作的桌宠项目，不是库洛游戏或《鸣潮》的官方项目。
 
+## ⚡ Claude Code 一键部署
+
+把本仓库链接发给 Claude Code，它会自动完成部署：
+
+1. 下载 exe → 桌面
+2. 配置 hooks + MCP → `~/.claude/`
+3. （可选）部署对话管理 WebUI
+4. 启动桌宠
+
+详见 [CLAUDE.md](CLAUDE.md)。
+
 ## 功能
 
 - 15 种像素动画状态，随 Claude Code 操作实时切换
