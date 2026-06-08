@@ -392,4 +392,4 @@ function cancelIdleAnim() {
   if (idleAnimTimer) { clearTimeout(idleAnimTimer); idleAnimTimer = null; }
 }
 
-document.addEventListener('DOMContentLoaded', () => { init(); setupAutostartToggle(); });
+document.addEventListener('DOMContentLoaded', init);

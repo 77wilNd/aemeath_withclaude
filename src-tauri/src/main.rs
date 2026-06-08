@@ -55,7 +55,7 @@ async fn main() {
 
     // Build Tauri app
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app, open_webui, check_autostart, toggle_autostart])
+        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app, open_webui])
         .setup(move |app| {
             // Listen to broadcast channel, forward state changes to frontend
             let handle = app.handle().clone();
@@ -109,34 +109,6 @@ fn hide_window(window: tauri::Window) {
 #[tauri::command]
 fn exit_app(app: tauri::AppHandle) {
     app.exit(0);
-}
-
-#[tauri::command]
-fn check_autostart() -> bool {
-    let startup = std::env::var("APPDATA").unwrap_or_default().replace("\\", "/")
-        + "/Microsoft/Windows/Start Menu/Programs/Startup/Aemeath.bat";
-    std::path::Path::new(&startup).exists()
-}
-
-#[tauri::command]
-fn toggle_autostart() -> bool {
-    let startup_dir = std::env::var("APPDATA").unwrap_or_default().replace("\\", "/")
-        + "/Microsoft/Windows/Start Menu/Programs/Startup";
-    let bat_path = format!("{}/Aemeath.bat", startup_dir);
-    if std::path::Path::new(&bat_path).exists() {
-        std::fs::remove_file(&bat_path).ok();
-        return false;
-    }
-    let exe = std::env::current_exe().unwrap_or_default();
-    std::fs::create_dir_all(&startup_dir).ok();
-    let exe_path = exe.to_string_lossy().replace("\\", "/");
-    #[allow(unused_assignments)]
-    let mut bat = String::new();
-    bat.push_str("@echo off\r\n");
-    bat.push_str("start \"\" \"");
-    bat.push_str(&exe_path);
-    bat.push_str("\"\r\n");
-    std::fs::write(&bat_path, bat).is_ok()
 }
 
 #[tauri::command]
