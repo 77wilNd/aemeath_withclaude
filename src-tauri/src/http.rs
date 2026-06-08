@@ -64,6 +64,7 @@ pub fn create_router(
         .route("/api/user/pending", get(handle_user_pending))
         .route("/api/user/message", post(handle_user_message))
         .route("/api/user/message/pending", get(handle_user_message_pending))
+        .route("/api/session/messages", get(handle_session_messages))
         .layer(cors)
         .with_state(AppState {
             state,
@@ -385,4 +386,64 @@ async fn handle_user_message_pending(
         "messages": msgs,
         "count": msgs.len(),
     }))
+}
+
+
+/// GET /api/session/messages — return recent messages from the active session
+async fn handle_session_messages() -> Json<serde_json::Value> {
+    let claude_dir = std::path::PathBuf::from(
+        std::env::var("USERPROFILE").unwrap_or_default()
+    ).join(".claude").join("projects");
+    
+    let mut messages = Vec::new();
+    let mut newest_time = std::time::SystemTime::UNIX_EPOCH;
+    let mut newest_file = None;
+    
+    // Find the most recent jsonl across all projects
+    if let Ok(projects) = std::fs::read_dir(&claude_dir) {
+        for project in projects.flatten() {
+            let proj = project.path();
+            if !proj.is_dir() { continue; }
+            if let Ok(sessions) = std::fs::read_dir(&proj) {
+                for session in sessions.flatten() {
+                    let path = session.path();
+                    if path.extension().and_then(|e| e.to_str()) != Some("jsonl") { continue; }
+                    if let Ok(meta) = path.metadata() {
+                        if let Ok(mod_time) = meta.modified() {
+                            if mod_time > newest_time {
+                                newest_time = mod_time;
+                                newest_file = Some(path.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Read last 30 messages from newest session
+    if let Some(path) = newest_file {
+        if let Ok(content) = std::fs::read_to_string(&path) {
+            let mut msgs: Vec<serde_json::Value> = content
+                .lines()
+                .filter_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
+                .collect();
+            let start = if msgs.len() > 30 { msgs.len() - 30 } else { 0 };
+            for m in &msgs[start..] {
+                let role = match m.get("type").and_then(|t| t.as_str()) {
+                    Some("user") => "user",
+                    Some("assistant") => "assistant",
+                    _ => "tool",
+                };
+                let text = if role == "user" || role == "assistant" {
+                    m.get("message").and_then(|msg| msg.get("content")).and_then(|c| c.as_str()).unwrap_or("")
+                } else { "" };
+                if text.len() > 1 {
+                    messages.push(serde_json::json!({"role": role, "content": text}));
+                }
+            }
+        }
+    }
+    
+    Json(serde_json::json!({"messages": messages}))
 }
