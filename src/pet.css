@@ -331,3 +331,35 @@ html, body {
   0%, 100% { opacity: 0.4; transform: translateX(80px) scale(0.8); }
   50% { opacity: 1; transform: translateX(80px) scale(1.2); }
 }
+
+/* ── 回复拓展面板 ── */
+#conv-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: rgba(9, 11, 16, 0.92);
+  border-top: 1px solid #2A2D38;
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+#conv-panel.hidden { display: none; }
+#conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-family: "Consolas", "Microsoft YaHei", monospace;
+  color: #8E94A5;
+  line-height: 1.4;
+  scrollbar-width: thin;
+  scrollbar-color: #2A2D38 transparent;
+}
+.conv-msg { margin-bottom: 3px; padding: 2px 6px; border-radius: 4px; word-break: break-word; }
+.conv-msg.user { color: #4DA2FF; }
+.conv-msg.assistant { color: #3DD68C; }
+.conv-msg.tool { color: #B57BEE; font-size: 9px; }
+.conv-msg.loading { color: #5C6174; animation: blink 1s infinite; }
+@keyframes blink { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }

@@ -2,7 +2,70 @@
 
 Q 版像素爱弥斯桌宠，与 Claude Code 实时联动。
 
-## 安装
+## Claude Code 一键部署
+
+当用户分享本仓库链接并要求部署时，按以下步骤操作：
+
+### 1. 下载桌宠
+
+```bash
+# 从 Releases 下载预编译 exe（推荐）
+curl -L -o "$USERPROFILE/Desktop/Aemeath-Claude.exe" https://github.com/77wliNd/aemeath_withclaude/releases/latest/download/aemeath-claude.exe
+```
+
+### 2. 配置 Claude Code 集成
+
+```bash
+# 写入 MCP 配置
+cat > "$USERPROFILE/.claude/.mcp.json" << 'EOF'
+{
+  "aemeath": {
+    "type": "http",
+    "url": "http://127.0.0.1:9528/mcp"
+  }
+}
+EOF
+```
+
+在 `~/.claude/settings.json` 中合并以下 hooks：
+
+```json
+{
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -Command \"if (-not (Get-Process -Name 'Aemeath-Claude' -ErrorAction SilentlyContinue)) { Start-Process '$USERPROFILE/Desktop/Aemeath-Claude.exe' }\""
+      }]
+    }],
+    "UserPromptSubmit": [{"matcher": "", "hooks": [{"type": "http", "url": "http://127.0.0.1:9527/api/hook/thinking"}]}],
+    "PreToolUse": [{"matcher": "", "hooks": [{"type": "http", "url": "http://127.0.0.1:9527/api/hook/working"}]}],
+    "PostToolUse": [{"matcher": "", "hooks": [{"type": "http", "url": "http://127.0.0.1:9527/api/hook/done"}]}],
+    "Stop": [{"matcher": "", "hooks": [{"type": "http", "url": "http://127.0.0.1:9527/api/hook/idle"}]}]
+  }
+}
+```
+
+### 3. （可选）部署对话管理 WebUI
+
+```bash
+git clone https://github.com/hanasite/claude-code-webui.git ~/.claude/webui/
+pip install flask
+pythonw ~/.claude/webui/server.py --no-browser
+```
+
+### 4. 重启 Claude Code 并启动桌宠
+
+```bash
+start "" "$USERPROFILE/Desktop/Aemeath-Claude.exe"
+```
+
+重启 Claude Code 后，宠物会自动响应对话事件。
+
+---
+
+## 安装（手动）
 
 1. 启动 Aemeath.exe（宠物显示在桌面 + 托盘图标）
 2. 将 [docs/hooks.json](docs/hooks.json) 合并到 `~/.claude/settings.json`（注意替换 exe 路径）
@@ -147,7 +210,18 @@ MCP Tool 调用
 - 休眠 — 隐藏窗口，通过托盘右键恢复
 - 关机 — 退出程序
 - 发消息 — 打开输入气泡
+- 📊 对话管理 — 打开 WebUI 对话管理器
 - 语音输入 — 暂未支持
+
+### 8. 对话管理 WebUI (webui.rs)
+
+右键菜单/托盘 → "📊 对话管理" 打开浏览器端对话管理器（`http://127.0.0.1:19876`）：
+
+- 智能启动：检测端口 19876，未运行时自动 `pythonw server.py --no-browser` 后台启动
+- 路径解析：通过 `USERPROFILE` 环境变量定位 `~/.claude/webui/server.py`
+- 依赖：`pip install flask`
+
+WebUI 独立仓库：https://github.com/hanasite/claude-code-webui
 
 ### 5. 气泡锁机制
 

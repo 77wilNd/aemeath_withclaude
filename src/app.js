@@ -295,6 +295,9 @@ function setupQuickMenu() {
         case 'voice':
           bubble.show('语音输入暂不支持~');
           break;
+        case 'webui':
+          try { window.__TAURI_INTERNALS__?.invoke('open_webui'); } catch (_) {}
+          break;
         case 'sleep':
           try { window.__TAURI_INTERNALS__?.invoke('hide_window'); } catch (_) {}
           bubble.show('爱弥斯已休眠，右键托盘唤醒~');
@@ -389,4 +392,64 @@ function cancelIdleAnim() {
   if (idleAnimTimer) { clearTimeout(idleAnimTimer); idleAnimTimer = null; }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => { init(); setupReplyToggle(); });
+
+// ========== 回复拓展开关 ==========
+let replyEnabled = false;
+let replyPollTimer = null;
+let lastMsgCount = 0;
+
+function setupReplyToggle() {
+  const toggle = document.getElementById('reply-toggle');
+  const panel = document.getElementById('conv-panel');
+  if (!toggle || !panel) return;
+
+  // Load saved state
+  replyEnabled = localStorage.getItem('aemeath-reply-expand') === 'true';
+  toggle.checked = replyEnabled;
+  if (replyEnabled) { panel.classList.remove('hidden'); startReplyPoll(); }
+  else { panel.classList.add('hidden'); }
+
+  toggle.addEventListener('change', () => {
+    replyEnabled = toggle.checked;
+    localStorage.setItem('aemeath-reply-expand', replyEnabled);
+    if (replyEnabled) { panel.classList.remove('hidden'); startReplyPoll(); }
+    else { panel.classList.add('hidden'); stopReplyPoll(); }
+  });
+}
+
+function startReplyPoll() {
+  if (replyPollTimer) return;
+  lastMsgCount = 0;
+  replyPollTimer = setInterval(pollMessages, 2000);
+  pollMessages();
+}
+
+function stopReplyPoll() {
+  if (replyPollTimer) { clearInterval(replyPollTimer); replyPollTimer = null; }
+  const el = document.getElementById('conv-messages');
+  if (el) el.innerHTML = '';
+}
+
+function pollMessages() {
+  try {
+    // Try WebUI API first, fallback to Aemeath HTTP API
+    fetch('http://127.0.0.1:9527/api/session/messages')
+      .then(r => r.json())
+      .then(data => {
+        if (data.messages && data.messages.length > lastMsgCount) {
+          const panel = document.getElementById('conv-messages');
+          if (!panel) return;
+          for (let i = lastMsgCount; i < data.messages.length; i++) {
+            const m = data.messages[i];
+            const div = document.createElement('div');
+            div.className = 'conv-msg ' + (m.role || 'assistant');
+            div.textContent = (m.content || '').substring(0, 300);
+            panel.appendChild(div);
+          }
+          lastMsgCount = data.messages.length;
+          panel.scrollTop = panel.scrollHeight;
+        }
+      }).catch(() => {});
+  } catch(_) {}
+}

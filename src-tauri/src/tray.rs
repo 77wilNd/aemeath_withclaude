@@ -1,3 +1,4 @@
+use crate::webui;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -9,6 +10,7 @@ pub fn setup(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let scale_1x = MenuItem::with_id(app, "scale_1x", "缩放 1x", true, None::<&str>)?;
     let scale_1_5x = MenuItem::with_id(app, "scale_1_5x", "缩放 1.5x", true, None::<&str>)?;
     let scale_2x = MenuItem::with_id(app, "scale_2x", "缩放 2x", true, None::<&str>)?;
+    let webui_item = MenuItem::with_id(app, "webui", "📊 对话管理", true, None::<&str>)?;
     let about_item = MenuItem::with_id(app, "about", "关于", true, None::<&str>)?;
     let quit_item = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
 
@@ -19,6 +21,7 @@ pub fn setup(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
             &scale_1x,
             &scale_1_5x,
             &scale_2x,
+            &webui_item,
             &about_item,
             &quit_item,
         ],
@@ -38,6 +41,11 @@ pub fn setup(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                             let _ = window.set_focus();
                         }
                     }
+                }
+                "webui" => {
+                    std::thread::spawn(|| {
+                        webui::launch_webui();
+                    });
                 }
                 "quit" => {
                     app.exit(0);

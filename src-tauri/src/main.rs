@@ -2,6 +2,7 @@
 
 mod http;
 mod mcp;
+mod webui;
 mod state;
 mod tray;
 
@@ -54,7 +55,7 @@ async fn main() {
 
     // Build Tauri app
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app])
+        .invoke_handler(tauri::generate_handler![start_drag, hide_window, exit_app, open_webui])
         .setup(move |app| {
             // Listen to broadcast channel, forward state changes to frontend
             let handle = app.handle().clone();
@@ -108,4 +109,11 @@ fn hide_window(window: tauri::Window) {
 #[tauri::command]
 fn exit_app(app: tauri::AppHandle) {
     app.exit(0);
+}
+
+#[tauri::command]
+fn open_webui() {
+    std::thread::spawn(|| {
+        webui::launch_webui();
+    });
 }
